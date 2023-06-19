@@ -4,10 +4,11 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
+#include "stdint.h"
 
 
 typedef enum {
-    /*OPERATPRS*/
+    /*OPERATORS*/
     tokenPLUS,
     tokenMINUS,
     tokenMUL,
@@ -21,6 +22,18 @@ typedef enum {
     tokenRPAREN,
     tokenSEMICOLON,
 
+    /* KEYWORDS */
+    tokenIF,
+    tokenELSE,
+    tokenFUNCTION,
+    tokenFOR,
+    tokenWHILE,
+    tokenRETURN,
+    
+    tokenIDENT,
+    tokenINT,
+
+    tokenILLEGAL,
     tokenEOF
 }TokenType;
 
