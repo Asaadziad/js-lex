@@ -52,5 +52,7 @@ TokenType getTokenType(TOKEN token);
 void lexerDestroy(LEXER lexer);
 void lexerPrintInfo(LEXER lexer);
 
+void tokenDestroy(TOKEN token);
+
 
 #endif

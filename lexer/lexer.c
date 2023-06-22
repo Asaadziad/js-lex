@@ -65,39 +65,39 @@ TOKEN lexerGetNext(LEXER lexer){
     switch (lexer->character)
     {
     case '+':
-        token = tokenCreate(tokenPLUS,"+");
+        token = tokenCreate(tokenPLUS,NULL);
         break;
     case '*':
-        token = tokenCreate(tokenMUL, "*");
+        token = tokenCreate(tokenMUL, NULL);
         break;
     case '=':
         if(_lexerPeek(lexer) == '='){
             _readChar(lexer);
-            token = tokenCreate(tokenEQUAL,"==");
+            token = tokenCreate(tokenEQUAL,NULL);
             break;
         }
-        token = tokenCreate(tokenASSIGN, "=");
+        token = tokenCreate(tokenASSIGN, NULL);
         break;
     case '-':
-        token = tokenCreate(tokenMINUS,"-");
+        token = tokenCreate(tokenMINUS,NULL);
         break;
     case ';':
-        token = tokenCreate(tokenSEMICOLON,";");
+        token = tokenCreate(tokenSEMICOLON, NULL);
         break;
     case '{':
-        token = tokenCreate(tokenRSQUIRLY, "{");
+        token = tokenCreate(tokenRSQUIRLY, NULL);
         break;
     case '}':
-        token = tokenCreate(tokenLSQUIRLY, "}");
+        token = tokenCreate(tokenLSQUIRLY, NULL);
         break;
     case '(':
-        token = tokenCreate(tokenLPAREN,"(");
+        token = tokenCreate(tokenLPAREN,NULL);
         break;
     case ')':
-        token = tokenCreate(tokenRPAREN,")");
+        token = tokenCreate(tokenRPAREN,NULL);
         break;
     case '\0':
-        token = tokenCreate(tokenEOF,"EOF");
+        token = tokenCreate(tokenEOF,NULL);
         break;    
     }
 
@@ -106,19 +106,24 @@ TOKEN lexerGetNext(LEXER lexer){
         
         const char* ident = _readIdentifier(lexer,&len);
         
-        char* literal = (char*) malloc(sizeof(*literal) * (len));
+        char* literal = (char*) malloc(sizeof(*literal) * (len + 1));
+        if(!literal) return tokenCreate(tokenILLEGAL,NULL);
         strncpy(literal,ident, len);
+        literal[len] = '\0';
         TokenType type = _getTokenTypeFromLiteral(literal, len);
-        token = tokenCreate(type, literal);
+        token = tokenCreate(tokenIDENT, literal);
         return token;
+        
     } else if(_isNumber(lexer->character)){
         unsigned int len;
         const char* ident = _readInt(lexer,&len);
-        char* literal = (char*) malloc(sizeof(*literal) * (len));
+        char* literal = (char*) malloc(sizeof(*literal) * (len + 1));
         strncpy(literal,ident, len);
+        literal[len] = '\0';
         TokenType type = _getTokenTypeFromLiteral(literal, len);
         token = tokenCreate(type, literal);
         return token;
+        
     }
 
     if(!token){
@@ -130,6 +135,8 @@ TOKEN lexerGetNext(LEXER lexer){
 }
 
 void tokenPrint(TOKEN token){
+    if(!token) return;
+    
     printf("{ type: '%d', value: '%s' }\n", token->type, token->literal);
 }
 
@@ -147,6 +154,14 @@ void lexerDestroy(LEXER lexer){
     free(lexer);
 }
 
+void tokenDestroy(TOKEN token){
+    if(!token) return;
+    if(token->literal){
+    free(token->literal);
+    }
+    free(token);
+}
+
 /* PRIVATE FUNCTIONS */
 static void _skipWhiteSpaces(LEXER lexer){
     while(lexer->character == ' ' || lexer->character == '\t' || lexer->character == '\r'
@@ -157,6 +172,7 @@ static void _skipWhiteSpaces(LEXER lexer){
 }
 
 static void _readChar(LEXER lexer){
+    if(!lexer) return;
     if(lexer->reading_pos >= lexer->buffer_len){
         lexer->character = '\0';
     } else {
