@@ -1,1 +1,1 @@
-# js-mini-interpreter
+# JS mini lexer
